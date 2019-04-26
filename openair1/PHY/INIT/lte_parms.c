@@ -208,4 +208,7 @@ void dump_frame_parms(LTE_DL_FRAME_PARMS *frame_parms)
   LOG_I(PHY,"frame_parms->first_carrier_offset=%d\n",frame_parms->first_carrier_offset);
   LOG_I(PHY,"frame_parms->samples_per_tti=%d\n",frame_parms->samples_per_tti);
   LOG_I(PHY,"frame_parms->symbols_per_tti=%d\n",frame_parms->symbols_per_tti);
+  LOG_I(PHY,"lte_parms,frame_parms->Nid_cell=%d,frame_parms->Ncp_UL=%d,frame_parms->nushift=%d,frame_parms->nb_antenna_ports_eNB=%d,frame_parms->ofdm_symbol_size=%d,frame_parms->nb_prefix_samples=%d,frame_parms->first_carrier_offset=%d,frame_parms->samples_per_tti=%d,frame_parms->symbols_per_tti=%d\n",
+        frame_parms->Nid_cell,frame_parms->Ncp_UL,frame_parms->nushift,frame_parms->nb_antenna_ports_eNB,frame_parms->ofdm_symbol_size,frame_parms->nb_prefix_samples,
+        frame_parms->first_carrier_offset,frame_parms->samples_per_tti,frame_parms->symbols_per_tti);
 }
