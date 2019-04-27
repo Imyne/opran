@@ -185,7 +185,15 @@ static inline int rxtx(PHY_VARS_eNB *eNB,L1_rxtx_proc_t *proc, char *thread_name
         eNB->UL_INFO.rach_ind.rach_indication_body.number_of_preambles ||
         eNB->UL_INFO.cqi_ind.number_of_cqis
        ) {
-      LOG_D(PHY, "UL_info[rx_ind:%05d:%d harqs:%05d:%d crcs:%05d:%d preambles:%05d:%d cqis:%d] RX:%04d%d TX:%04d%d num_pdcch_symbols:%d\n",
+      /*LOG_I(PHY, "UL_info[rx_ind:%05d:%d harqs:%05d:%d crcs:%05d:%d preambles:%05d:%d cqis:%d] RX:%04d%d TX:%04d%d num_pdcch_symbols:%d\n",
+            NFAPI_SFNSF2DEC(eNB->UL_INFO.rx_ind.sfn_sf),   eNB->UL_INFO.rx_ind.rx_indication_body.number_of_pdus,
+            NFAPI_SFNSF2DEC(eNB->UL_INFO.harq_ind.sfn_sf), eNB->UL_INFO.harq_ind.harq_indication_body.number_of_harqs,
+            NFAPI_SFNSF2DEC(eNB->UL_INFO.crc_ind.sfn_sf),  eNB->UL_INFO.crc_ind.crc_indication_body.number_of_crcs,
+            NFAPI_SFNSF2DEC(eNB->UL_INFO.rach_ind.sfn_sf), eNB->UL_INFO.rach_ind.rach_indication_body.number_of_preambles,
+            eNB->UL_INFO.cqi_ind.number_of_cqis,
+            proc->frame_rx, proc->subframe_rx,
+            proc->frame_tx, proc->subframe_tx, eNB->pdcch_vars[proc->subframe_tx&1].num_pdcch_symbols);*/
+      LOG_I(PHY, "UL_info,%05d:%d,%05d:%d,%05d:%d,%05d:%d,%d,%04d%d,%04d%d,%d\n",
             NFAPI_SFNSF2DEC(eNB->UL_INFO.rx_ind.sfn_sf),   eNB->UL_INFO.rx_ind.rx_indication_body.number_of_pdus,
             NFAPI_SFNSF2DEC(eNB->UL_INFO.harq_ind.sfn_sf), eNB->UL_INFO.harq_ind.harq_indication_body.number_of_harqs,
             NFAPI_SFNSF2DEC(eNB->UL_INFO.crc_ind.sfn_sf),  eNB->UL_INFO.crc_ind.crc_indication_body.number_of_crcs,
@@ -246,7 +254,7 @@ static inline int rxtx(PHY_VARS_eNB *eNB,L1_rxtx_proc_t *proc, char *thread_name
               exit_fun( "ERROR pthread_cond_signal cond_pre_scd" );
           }
       }else{
-          LOG_E( PHY, "[eNB] frame %d subframe %d rxtx busy instance_pre_scd %d\n",
+          LOG_E( PHY, "ERR1,%d, %d,%d\n",
                  proc->frame_rx,proc->subframe_rx,ru->proc.instance_pre_scd );
       }
 
@@ -281,7 +289,14 @@ static inline int rxtx(PHY_VARS_eNB *eNB,L1_rxtx_proc_t *proc, char *thread_name
   /* CONFLICT RESOLUTION: END */
   stop_meas( &softmodem_stats_rxtx_sf );
   LOG_D(PHY,"%s() Exit proc[rx:%d%d tx:%d%d]\n", __FUNCTION__, proc->frame_rx, proc->subframe_rx, proc->frame_tx, proc->subframe_tx);
-  LOG_D(PHY, "rxtx:%lld nfapi:%lld tx:%lld rx:%lld prach:%lld ofdm:%lld ",
+  /*LOG_I(PHY, "rxtx:%lld nfapi:%lld tx:%lld rx:%lld prach:%lld ofdm:%lld ",
+        softmodem_stats_rxtx_sf.p_time, nfapi_meas.p_time,
+        TICK_TO_US(eNB->phy_proc_tx),
+        TICK_TO_US(eNB->phy_proc_rx),
+        TICK_TO_US(eNB->rx_prach),
+        TICK_TO_US(eNB->ofdm_mod_stats)
+       );*/
+  LOG_I(PHY, "rxtx,%lld nfapi:%lld,%lld,%lld,%lld,%lld,",
         softmodem_stats_rxtx_sf.p_time, nfapi_meas.p_time,
         TICK_TO_US(eNB->phy_proc_tx),
         TICK_TO_US(eNB->phy_proc_rx),
@@ -297,19 +312,39 @@ static inline int rxtx(PHY_VARS_eNB *eNB,L1_rxtx_proc_t *proc, char *thread_name
         TICK_TO_US(eNB->dlsch_turbo_encoding_stats),
         TICK_TO_US(eNB->dlsch_interleaving_stats),
         TICK_TO_US(eNB->rx_dft_stats));
-  LOG_D(PHY," ulsch[ch:%lld freq:%lld dec:%lld demod:%lld ru:%lld ",
+  /*LOG_I(PHY," ulsch[ch:%lld freq:%lld dec:%lld demod:%lld ru:%lld ",
+        TICK_TO_US(eNB->ulsch_channel_estimation_stats),
+        TICK_TO_US(eNB->ulsch_freq_offset_estimation_stats),
+        TICK_TO_US(eNB->ulsch_decoding_stats),
+        TICK_TO_US(eNB->ulsch_demodulation_stats),
+        TICK_TO_US(eNB->ulsch_rate_unmatching_stats));*/
+  LOG_I(PHY," ulsch_ch,%lld,%lld,%lld,%lld,%lld,",
         TICK_TO_US(eNB->ulsch_channel_estimation_stats),
         TICK_TO_US(eNB->ulsch_freq_offset_estimation_stats),
         TICK_TO_US(eNB->ulsch_decoding_stats),
         TICK_TO_US(eNB->ulsch_demodulation_stats),
         TICK_TO_US(eNB->ulsch_rate_unmatching_stats));
-  LOG_D(PHY, "td:%lld dei:%lld dem:%lld llr:%lld tci:%lld ",
+  /*LOG_I(PHY, "td:%lld dei:%lld dem:%lld llr:%lld tci:%lld ",
+        TICK_TO_US(eNB->ulsch_turbo_decoding_stats),
+        TICK_TO_US(eNB->ulsch_deinterleaving_stats),
+        TICK_TO_US(eNB->ulsch_demultiplexing_stats),
+        TICK_TO_US(eNB->ulsch_llr_stats),
+        TICK_TO_US(eNB->ulsch_tc_init_stats));*/
+    LOG_I(PHY, "td,%lld,%lld,%lld,%lld,%lld ",
         TICK_TO_US(eNB->ulsch_turbo_decoding_stats),
         TICK_TO_US(eNB->ulsch_deinterleaving_stats),
         TICK_TO_US(eNB->ulsch_demultiplexing_stats),
         TICK_TO_US(eNB->ulsch_llr_stats),
         TICK_TO_US(eNB->ulsch_tc_init_stats));
-  LOG_D(PHY, "tca:%lld tcb:%lld tcg:%lld tce:%lld l1:%lld l2:%lld]\n\n",
+  /*LOG_I(PHY, "tca:%lld tcb:%lld tcg:%lld tce:%lld l1:%lld l2:%lld]\n\n",
+        TICK_TO_US(eNB->ulsch_tc_alpha_stats),
+        TICK_TO_US(eNB->ulsch_tc_beta_stats),
+        TICK_TO_US(eNB->ulsch_tc_gamma_stats),
+        TICK_TO_US(eNB->ulsch_tc_ext_stats),
+        TICK_TO_US(eNB->ulsch_tc_intl1_stats),
+        TICK_TO_US(eNB->ulsch_tc_intl2_stats)
+       );*/
+  LOG_I(PHY, "tca,%lld,%lld,%lld,%lld,%lld,%lld,\n\n",
         TICK_TO_US(eNB->ulsch_tc_alpha_stats),
         TICK_TO_US(eNB->ulsch_tc_beta_stats),
         TICK_TO_US(eNB->ulsch_tc_gamma_stats),
@@ -448,7 +483,7 @@ void eNB_top(PHY_VARS_eNB *eNB, int frame_rx, int subframe_rx, char *string,RU_t
     L1_proc->frame_tx     = (L1_proc->subframe_rx > (9-sf_ahead)) ? (L1_proc->frame_rx+1)&1023 : L1_proc->frame_rx;
     L1_proc->subframe_tx  = (L1_proc->subframe_rx + sf_ahead)%10;
 
-    if (rxtx(eNB,L1_proc,string) < 0) LOG_E(PHY,"eNB %d CC_id %d failed during execution\n",eNB->Mod_id,eNB->CC_id);
+    if (rxtx(eNB,L1_proc,string) < 0) LOG_I(PHY,"errcc_id, %d,%d,\n",eNB->Mod_id,eNB->CC_id);//LOG_E(PHY,"eNB %d CC_id %d failed during execution\n",eNB->Mod_id,eNB->CC_id);
     ru_proc->timestamp_tx = L1_proc->timestamp_tx;
     ru_proc->subframe_tx  = L1_proc->subframe_tx;
     ru_proc->frame_tx     = L1_proc->frame_tx;
@@ -466,7 +501,8 @@ int wakeup_txfh(L1_rxtx_proc_t *proc,PHY_VARS_eNB *eNB) {
   wait.tv_nsec=5000000L;
 
   if(wait_on_condition(&proc->mutex_RUs,&proc->cond_RUs,&proc->instance_cnt_RUs,"wakeup_txfh")<0) {
-    LOG_E(PHY,"Frame %d, subframe %d: TX FH not ready\n", proc->frame_tx, proc->subframe_tx);
+    LOG_E(PHY,"ERR,Frame %d, subframe %d: TX FH not ready\n", proc->frame_tx, proc->subframe_tx);
+    //LOG_I(PHY,"err,%d,%d,\n", proc->frame_tx, proc->subframe_tx);
     return(-1);
   }
   pthread_mutex_lock(&eNB->proc.mutex_RU_tx);
@@ -479,12 +515,14 @@ int wakeup_txfh(L1_rxtx_proc_t *proc,PHY_VARS_eNB *eNB) {
     ru      = eNB->RU_list[i];
     ru_proc = &ru->proc;
     if (ru_proc->instance_cnt_eNBs == 0) {
-      LOG_E(PHY,"Frame %d, subframe %d: TX FH thread busy, dropping Frame %d, subframe %d\n", ru_proc->frame_tx, ru_proc->subframe_tx, proc->frame_rx, proc->subframe_rx);
+      //LOG_I(PHY,"ERR,Frame %d, subframe %d: TX FH thread busy, dropping Frame %d, subframe %d\n", ru_proc->frame_tx, ru_proc->subframe_tx, proc->frame_rx, proc->subframe_rx);
+      LOG_I(PHY,"err_drop,%d,%d,TX FH thread busy,%d, %d\n", ru_proc->frame_tx, ru_proc->subframe_tx, proc->frame_rx, proc->subframe_rx);
       return(-1);
     }
     if (pthread_mutex_timedlock(&ru_proc->mutex_eNBs,&wait) != 0) {
-      LOG_E( PHY, "[eNB] ERROR pthread_mutex_lock for eNB TX1 thread %d (IC %d)\n", ru_proc->subframe_rx&1,ru_proc->instance_cnt_eNBs );
-      exit_fun( "error locking mutex_eNB" );
+      //LOG_I( PHY, "ERR,[eNB] ERROR pthread_mutex_lock for eNB TX1 thread %d (IC %d)\n", ru_proc->subframe_rx&1,ru_proc->instance_cnt_eNBs );
+      LOG_I( PHY, "err_pthread,pthread_mutex_lock for eNB TX1 thread, %d,%d,\n", ru_proc->subframe_rx&1,ru_proc->instance_cnt_eNBs )
+      exit_fun( "error locking mutex_eNB");
       return(-1);
     }
 
@@ -497,7 +535,7 @@ int wakeup_txfh(L1_rxtx_proc_t *proc,PHY_VARS_eNB *eNB) {
     // the thread can now be woken up
     if (pthread_cond_signal(&ru_proc->cond_eNBs) != 0) {
       LOG_E( PHY, "[eNB] ERROR pthread_cond_signal for eNB TXnp4 thread\n");
-      exit_fun( "ERROR pthread_cond_signal" );
+      exit_fun( "ERROR pthread_cond_signal");
       return(-1);
     }
   
@@ -564,9 +602,10 @@ int wakeup_rxtx(PHY_VARS_eNB *eNB,RU_t *ru) {
   for (i=0; i<eNB->num_RU; i++) {
     if (ru == eNB->RU_list[i]) {
       if ((proc->RU_mask&(1<<i)) > 0)
-        LOG_E(PHY,"eNB %d frame %d, subframe %d : previous information from RU %d (num_RU %d,mask %x) has not been served yet!\n",
+        //LOG_E(PHY,"eNB %d frame %d, subframe %d : previous information from RU %d (num_RU %d,mask %x) has not been served yet!\n",
+              //eNB->Mod_id,proc->frame_rx,proc->subframe_rx,ru->idx,eNB->num_RU,proc->RU_mask);
+       LOG_I(PHY,"err_ru,%d,%d, %d,%d , %d,%x,not been served yet,\n",
               eNB->Mod_id,proc->frame_rx,proc->subframe_rx,ru->idx,eNB->num_RU,proc->RU_mask);
-
       proc->RU_mask |= (1<<i);
     }
   }
@@ -585,7 +624,8 @@ int wakeup_rxtx(PHY_VARS_eNB *eNB,RU_t *ru) {
 
     
   if (L1_proc->instance_cnt == 0) {
-    LOG_E(PHY,"Frame %d, subframe %d: RXTX0 thread busy, dropping\n",L1_proc->frame_rx,L1_proc->subframe_rx);
+    //LOG_E(PHY,"Frame %d, subframe %d: RXTX0 thread busy, dropping\n",L1_proc->frame_rx,L1_proc->subframe_rx);
+    LOG_I(PHY,"err_drop,%d,%d,\n",L1_proc->frame_rx,L1_proc->subframe_rx);
     return(-1);
   }
 
@@ -657,7 +697,8 @@ void wakeup_prach_eNB(PHY_VARS_eNB *eNB,RU_t *ru,int frame,int subframe) {
     LOG_D(PHY,"Triggering prach processing, frame %d, subframe %d\n",frame,subframe);
 
     if (proc->instance_cnt_prach == 0) {
-      LOG_W(PHY,"[eNB] Frame %d Subframe %d, dropping PRACH\n", frame,subframe);
+      //LOG_W(PHY,"[eNB] Frame %d Subframe %d, dropping PRACH\n", frame,subframe);
+      LOG_I(PHY,"err_drop_prach,%d, %d, dropping PRACH,\n", frame,subframe);
       return;
     }
 
@@ -720,7 +761,8 @@ void wakeup_prach_eNB_br(PHY_VARS_eNB *eNB,RU_t *ru,int frame,int subframe) {
     LOG_D(PHY,"Triggering prach br processing, frame %d, subframe %d\n",frame,subframe);
 
     if (proc->instance_cnt_prach_br == 0) {
-      LOG_W(PHY,"[eNB] Frame %d Subframe %d, dropping PRACH BR\n", frame,subframe);
+      //LOG_W(PHY,"[eNB] Frame %d Subframe %d, dropping PRACH BR\n", frame,subframe);
+      LOG_I(PHY,"err_drop_prach_br,%d , %d, dropping PRACH BR,\n", frame,subframe);
       return;
     }
 
