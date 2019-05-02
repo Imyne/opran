@@ -737,7 +737,7 @@ int pnf_phy_hi_dci0_req(nfapi_pnf_p7_config_t* pnf_p7, nfapi_hi_dci0_request_t* 
 
   if (req->hi_dci0_request_body.number_of_dci == 0 && req->hi_dci0_request_body.number_of_hi == 0)
     LOG_D(PHY,"[PNF] HI_DCI0_REQUEST SFN/SF:%05d dci:%d hi:%d\n", NFAPI_SFNSF2DEC(req->sfn_sf), req->hi_dci0_request_body.number_of_dci, req->hi_dci0_request_body.number_of_hi);
-
+    #LOG_I(PHY,"[PNF] HI_DCI0_REQUEST,%05d,%d,%d\n", NFAPI_SFNSF2DEC(req->sfn_sf), req->hi_dci0_request_body.number_of_dci, req->hi_dci0_request_body.number_of_hi);
   //phy_info* phy = (phy_info*)(pnf_p7->user_data);
 
   struct PHY_VARS_eNB_s *eNB = RC.eNB[0][0];
@@ -1606,8 +1606,8 @@ int oai_nfapi_rach_ind(nfapi_rach_indication_t *rach_ind) {
 
   rach_ind->header.phy_id = 1; // DJP HACK TODO FIXME - need to pass this around!!!!
 
-  LOG_D(PHY, "%s() sfn_sf:%d preambles:%d\n", __FUNCTION__, NFAPI_SFNSF2DEC(rach_ind->sfn_sf), rach_ind->rach_indication_body.number_of_preambles);
-
+  #LOG_D(PHY, "%s() sfn_sf:%d preambles:%d\n", __FUNCTION__, NFAPI_SFNSF2DEC(rach_ind->sfn_sf), rach_ind->rach_indication_body.number_of_preambles);
+  LOG_I(PHY, "preambles,%s(),%d,%d\n", __FUNCTION__, NFAPI_SFNSF2DEC(rach_ind->sfn_sf), rach_ind->rach_indication_body.number_of_preambles);
   return nfapi_pnf_p7_rach_ind(p7_config_g, rach_ind);
 }
 
@@ -1616,13 +1616,13 @@ int oai_nfapi_harq_indication(nfapi_harq_indication_t *harq_ind) {
   harq_ind->header.phy_id = 1; // DJP HACK TODO FIXME - need to pass this around!!!!
   harq_ind->header.message_id = NFAPI_HARQ_INDICATION;
 
-  LOG_D(PHY, "%s() sfn_sf:%d number_of_harqs:%d\n", __FUNCTION__, NFAPI_SFNSF2DEC(harq_ind->sfn_sf), harq_ind->harq_indication_body.number_of_harqs);
-
+  #LOG_D(PHY, "%s() sfn_sf:%d number_of_harqs:%d\n", __FUNCTION__, NFAPI_SFNSF2DEC(harq_ind->sfn_sf), harq_ind->harq_indication_body.number_of_harqs);
+  LOG_I(PHY, "number_of_harqs,%s(),%d,%d\n", __FUNCTION__, NFAPI_SFNSF2DEC(harq_ind->sfn_sf), harq_ind->harq_indication_body.number_of_harqs);
   int retval = nfapi_pnf_p7_harq_ind(p7_config_g, harq_ind);
 
   if (retval != 0)
     LOG_E(PHY, "%s() sfn_sf:%d number_of_harqs:%d nfapi_pnf_p7_harq_ind()=%d\n", __FUNCTION__, NFAPI_SFNSF2DEC(harq_ind->sfn_sf), harq_ind->harq_indication_body.number_of_harqs, retval);
-
+    LOG_E(PHY, "nfapi_pnf_p7_harq_ind,%s(),%d,%d,%d\n", __FUNCTION__, NFAPI_SFNSF2DEC(harq_ind->sfn_sf), harq_ind->harq_indication_body.number_of_harqs, retval);
   return retval;
 }
 
@@ -1632,7 +1632,7 @@ int oai_nfapi_crc_indication(nfapi_crc_indication_t *crc_ind) {
   crc_ind->header.message_id = NFAPI_CRC_INDICATION;
 
   //LOG_D(PHY, "%s() sfn_sf:%d number_of_crcs:%d\n", __FUNCTION__, NFAPI_SFNSF2DEC(crc_ind->sfn_sf), crc_ind->crc_indication_body.number_of_crcs);
-
+  LOG_I(PHY, "number_of_crcs,%s(),%d,%d\n", __FUNCTION__, NFAPI_SFNSF2DEC(crc_ind->sfn_sf), crc_ind->crc_indication_body.number_of_crcs);  
   return nfapi_pnf_p7_crc_ind(p7_config_g, crc_ind);
 }
 
@@ -1642,7 +1642,7 @@ int oai_nfapi_cqi_indication(nfapi_cqi_indication_t *ind) {
   ind->header.message_id = NFAPI_RX_CQI_INDICATION;
 
   //LOG_D(PHY, "%s() sfn_sf:%d number_of_cqis:%d\n", __FUNCTION__, NFAPI_SFNSF2DEC(ind->sfn_sf), ind->cqi_indication_body.number_of_cqis);
-
+  LOG_I(PHY, "number_of_cqis,%s(),%d,%d\n", __FUNCTION__, NFAPI_SFNSF2DEC(ind->sfn_sf), ind->cqi_indication_body.number_of_cqis);
   return nfapi_pnf_p7_cqi_ind(p7_config_g, ind);
 }
 
@@ -1654,7 +1654,7 @@ int oai_nfapi_rx_ind(nfapi_rx_indication_t *ind) {
   int retval = nfapi_pnf_p7_rx_ind(p7_config_g, ind);
 
   //LOG_D(PHY,"%s() SFN/SF:%d pdus:%d retval:%d\n", __FUNCTION__, NFAPI_SFNSF2DEC(ind->sfn_sf), ind->rx_indication_body.number_of_pdus, retval);
-
+  LOG_D(PHY,"retvalpdus,%s(),%d,%d,%d\n", __FUNCTION__, NFAPI_SFNSF2DEC(ind->sfn_sf), ind->rx_indication_body.number_of_pdus, retval);
   //free(ind.rx_indication_body.rx_pdu_list);
 
   return retval;
@@ -1667,7 +1667,7 @@ int oai_nfapi_sr_indication(nfapi_sr_indication_t *ind) {
   int retval = nfapi_pnf_p7_sr_ind(p7_config_g, ind);
 
   //LOG_D(PHY,"%s() SFN/SF:%d srs:%d retval:%d\n", __FUNCTION__, NFAPI_SFNSF2DEC(ind->sfn_sf), ind->sr_indication_body.number_of_srs, retval);
-
+  LOG_D(PHY,"srsretval,%s(),%d,%d,%d\n", __FUNCTION__, NFAPI_SFNSF2DEC(ind->sfn_sf), ind->sr_indication_body.number_of_srs, retval);
   //free(ind.rx_indication_body.rx_pdu_list);
 
   return retval;
